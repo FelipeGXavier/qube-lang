@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "lib": [
+        "ES2015",
+        "DOM"
+      ],
+      "sourceMap": true,
+      "outDir": "./build",
+      "rootDir": "./src",
+      "strict": false,
+      "noImplicitAny": false,
+      "esModuleInterop": true,
+      "noEmitOnError": true,
+      "watch": true
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }
