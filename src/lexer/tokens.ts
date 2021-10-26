@@ -6,6 +6,8 @@ export enum TokenType {
 
     Ident = "IDENT",
     Integer = "INTEGER",
+    Float = "FLOAT",
+    String = "STRING",
 
     // Operators
     Assign = "=",
@@ -20,7 +22,7 @@ export enum TokenType {
     LT = "<",
     EQ = "==",
     DIF = "<>",
-    
+
 
     // Delimiters
     Comma = ",",
@@ -37,7 +39,8 @@ export enum TokenType {
     False = "FALSE",
     If = "IF",
     Else = "ELSE",
-    Return = "RETURN"
+    Return = "RETURN",
+    Print = "PRINT"
 }
 
 
@@ -45,6 +48,7 @@ export class Token {
 
     public type: TokenType;
     public value: string;
+    public line = 0;
 
     constructor(type, value) {
         this.type = type;
@@ -53,14 +57,15 @@ export class Token {
 
 }
 
-export const keywords: { [keyword: string]: TokenType } = {
+export const keywords = {
     def: TokenType.Function,
-    let: TokenType.Val,
+    val: TokenType.Val,
     true: TokenType.True,
     false: TokenType.False,
     if: TokenType.If,
     else: TokenType.Else,
-    return: TokenType.Return
+    return: TokenType.Return,
+    print: TokenType.Print
 };
 
 
