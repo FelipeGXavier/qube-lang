@@ -55,6 +55,11 @@ export class Token {
         this.value = value;
     }
 
+    setLine(line) {
+        this.line = line;
+        return this;
+    }
+
 }
 
 export const keywords = {

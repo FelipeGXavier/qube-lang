@@ -8,7 +8,7 @@ export default class Lexer {
     // Próxima posição
     public readPos = 0;
     public currentChar: string | null = "";
-    private line = 0;
+    private line = 1;
 
     constructor(input: string) {
         this.input = input;
@@ -28,72 +28,64 @@ export default class Lexer {
     getNextToken() {
         let token = null;
 
-        // Remove espaços em branco e quebra de linha
-        while (this.currentChar === " " || this.currentChar === "\t" || this.currentChar === "\n" || this.currentChar === "\r") {
+        if (this.currentChar == "\n" && this.pos <= this.input.length - 1) {
             this.next();
+            this.line++;
         }
 
-        // if (this.currentChar == "\n" || this.currentChar == "\r" || this.currentChar == "\t") {
-        //     this.next();
-        //     this.line++;
-        //     this.getNextToken();
-        // }
-
-        // if (this.currentChar === " ") {
-        //     this.next();
-        //     this.getNextToken();
-        // }
+        while(this.currentChar == " ") {
+            this.next();
+        }
 
         if (this.currentChar == "=" && this.peek() == "=") {
             this.next();
-            token = new Token(TokenType.EQ, "==");
+            token = new Token(TokenType.EQ, "==").setLine(this.line);
         } else if (this.currentChar == "'") {
-            token = new Token(TokenType.String, this.string());
+            token = new Token(TokenType.String, this.string()).setLine(this.line);
         } else if (this.currentChar == TokenType.Assign) {
-            token = new Token(TokenType.Assign, this.currentChar);
+            token = new Token(TokenType.Assign, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Plus) {
-            token = new Token(TokenType.Plus, this.currentChar);
+            token = new Token(TokenType.Plus, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Semicolon) {
-            token = new Token(TokenType.Semicolon, this.currentChar);
+            token = new Token(TokenType.Semicolon, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Comma) {
-            token = new Token(TokenType.Comma, this.currentChar);
+            token = new Token(TokenType.Comma, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.LParen) {
-            token = new Token(TokenType.LParen, this.currentChar);
+            token = new Token(TokenType.LParen, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.RParen) {
-            token = new Token(TokenType.RParen, this.currentChar);
+            token = new Token(TokenType.RParen, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.LBrace) {
-            token = new Token(TokenType.LBrace, this.currentChar);
+            token = new Token(TokenType.LBrace, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.RBrace) {
-            token = new Token(TokenType.RBrace, this.currentChar);
+            token = new Token(TokenType.RBrace, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Deny) {
-            token = new Token(TokenType.Deny, this.currentChar);
+            token = new Token(TokenType.Deny, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Minus) {
-            token = new Token(TokenType.Minus, this.currentChar);
+            token = new Token(TokenType.Minus, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Mul) {
-            token = new Token(TokenType.Mul, this.currentChar);
+            token = new Token(TokenType.Mul, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.Div) {
-            token = new Token(TokenType.Div, this.currentChar);
+            token = new Token(TokenType.Div, this.currentChar).setLine(this.line);
         } else if (this.currentChar == '<' && this.peek() == '>') {
             this.next();
-            token = new Token(TokenType.DIF, "<>");
+            token = new Token(TokenType.DIF, "<>").setLine(this.line);
         } else if (this.currentChar == TokenType.GT) {
-            token = new Token(TokenType.GT, this.currentChar);
+            token = new Token(TokenType.GT, this.currentChar).setLine(this.line);
         } else if (this.currentChar == TokenType.LT) {
-            token = new Token(TokenType.LT, this.currentChar);
-        }
-        else if (this.currentChar == null) {
+            token = new Token(TokenType.LT, this.currentChar).setLine(this.line);
+        } else if (this.currentChar == null) {
             // Fim da entrada
-            token = new Token(TokenType.EOF, this.currentChar);
+            token = new Token(TokenType.EOF, this.currentChar).setLine(this.line);
         } else {
             if (this.isLetter(this.currentChar)) {
                 const target = this.val();
                 let type = keywords[target];
                 if (!type) type = TokenType.Ident;
-                return new Token(type, target);
+                return new Token(type, target).setLine(this.line);
             } else if (this.isNumeric(this.currentChar)) {
                 return this.numeric();
             } else {
-                return new Token(TokenType.Illegal, this.currentChar);
+                return new Token(TokenType.Illegal, this.currentChar).setLine(this.line);
             }
         }
         this.next();
@@ -118,9 +110,9 @@ export default class Lexer {
             while (this.currentChar != null && this.isNumeric(this.currentChar)) {
                 this.next();
             }
-            return new Token(TokenType.Float, this.input.slice(pos, this.pos));
+            return new Token(TokenType.Float, this.input.slice(pos, this.pos)).setLine(this.line);
         }
-        return new Token(TokenType.Integer, this.input.slice(pos, this.pos));
+        return new Token(TokenType.Integer, this.input.slice(pos, this.pos)).setLine(this.line);
     }
 
     private string() {

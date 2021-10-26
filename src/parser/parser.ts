@@ -98,7 +98,7 @@ export default class Parser {
     parseExpression(precedence) {
         const prefix = this.prefixFn[this.currentToken.type];
         if (!prefix) {
-            this.errors.push("Expressão inválida " + this.currentToken.type);
+            this.errors.push(`Linha ${this.currentToken.line}, Expressão inválida ${this.currentToken.type}`);
             return null;
         }
         let leftExpression = prefix();
@@ -131,7 +131,7 @@ export default class Parser {
                 return { kind: ASTKind.Float, value };
             }
         } catch (e) {
-            const msg = "Não foi possível converter o valor numérico " + this.currentToken.value;
+            const msg = `Linha ${this.currentToken.line}, Não foi possível converter o valor numérico ${this.currentToken.value}`;
             this.errors.push(msg);
             return null;
         }
@@ -181,7 +181,7 @@ export default class Parser {
     parseExpr(precedence) {
         const prefix = this.prefixFn[this.currentToken.type];
         if (!prefix) {
-            this.errors.push("Expressão inválida");
+            this.errors.push(`Linha ${this.currentToken.line}, Expressão inválida`);
             return null;
         }
         let leftExpression = prefix();
@@ -258,7 +258,7 @@ export default class Parser {
     parseCallExpr(expression) {
         // Verifica se argumento é uma variável ou função
         if (expression.kind !== ASTKind.Id && expression.kind !== ASTKind.FunctionLiteral) {
-            const msg = "Expressão de chamada espera um elemento ou função, obetido " + expression.kind;
+            const msg = `Linha ${this.currentToken.line}, Expressão de chamada espera um elemento ou função, obetido ${expression.kind}`;
             this.errors.push(msg);
             return null;
         }
@@ -320,7 +320,7 @@ export default class Parser {
             this.next();
             return true;
         } else {
-            const msg = "Elemento esperado " + tokenType + ", obtido " + this.peekToken.type;
+            const msg = `Linha ${this.currentToken.line}, Elemento esperado ${tokenType}, obtido ${this.peekToken.type}`;
             this.errors.push(msg);
             return false;
         }
