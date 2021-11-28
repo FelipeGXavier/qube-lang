@@ -1,4 +1,4 @@
-import { ASTKind, Expression, ExprStatement, Integer, PrefixExpression } from '../ast/ast';
+import { ASTKind, Expression, ExprStatement, Integer, PrefixExpression, Program } from '../ast/ast';
 import Lexer from "../lexer/lexer";
 import { Token, TokenType } from "../lexer/tokens";
 
@@ -31,7 +31,7 @@ export default class Parser {
     }
 
     // Produz AST 
-    public parse() {
+    public parse(): Program {
         const statements = [];
         while (this.currentToken.type != TokenType.EOF) {
             const statement = this.parseStatement();

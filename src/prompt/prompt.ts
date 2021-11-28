@@ -1,6 +1,7 @@
 import Lexer from '../lexer/lexer';
-import { TokenType } from '../lexer/tokens';
 import Parser from '../parser/parser';
+import { Interpreter } from '../code/eval';
+import { SymbolTable } from '../env/symbol.table';
 const readline = require('readline');
 var log = console.log;
 
@@ -41,9 +42,14 @@ async function run() {
         const ast = parser.parse();
         if (parser.getErrors().length > 0) {
             console.log(parser.getErrors());
+            continue;
         }else {
             console.dir(ast, {depth: null});
         }
+        const interpreter = new Interpreter();
+        const symbolTable = new SymbolTable();
+        const result = interpreter.eval(ast, symbolTable);
+        console.log(result.inspect());
     }
 }
 
