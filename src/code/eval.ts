@@ -9,17 +9,26 @@ import { H_TYPES } from './util';
 export class Interpreter {
 
     eval(node: Node, symbolTable: SymbolTable) {
-        if (node.kind == ASTKind.Program) {
-            return this.evalStatements(node.statements, symbolTable);
-        } else if (node.kind == ASTKind.ExprStatement) {
-            return this.eval(node.expression, symbolTable);
-        } else if (node.kind == ASTKind.Integer) {
-            return new IntegerT(node.value);
-        } else if (node.kind == ASTKind.Bool) {
-            return new BoolT(node.value);
-        } else if (node.kind == ASTKind.PrefixExpression) {
-            const right = this.eval(node.right, symbolTable);
-            return this.evalPrefixExpr(node.operator, right);
+        switch (node.kind) {
+            case ASTKind.PrefixExpression:
+                return;
+            case ASTKind.Program:
+                return this.evalStatements(node.statements, symbolTable);
+            case ASTKind.ExprStatement:
+                return this.eval(node.expression, symbolTable);
+            case ASTKind.Integer:
+                return new IntegerT(node.value);
+            case ASTKind.Bool:
+                return new BoolT(node.value);
+            case ASTKind.PrefixExpression:
+                const right = this.eval(node.right, symbolTable);
+                return this.evalPrefixExpr(node.operator, right);
+            case ASTKind.InfixExpression:
+                const left = this.eval(node.left, symbolTable);
+                if (this.errorType(left)) return left;
+                const rightOp = this.eval(node.right, symbolTable);
+                if (this.errorType(rightOp)) return rightOp;
+                return this.evalInfixExpr(node.operator, left, rightOp);
         }
     }
 
@@ -31,12 +40,61 @@ export class Interpreter {
         return result;
     }
 
+    evalInfixExpr(operator: string, left: BaseType, right: BaseType): BaseType {
+        if (left instanceof BoolT && right instanceof BoolT) {
+            return this.evalBooleanInfixOperator(operator, left, right);
+        }
+        if (left instanceof IntegerT && right instanceof IntegerT) {
+            return this.evalIntegerInfixOperator(operator, left, right);
+        }
+        return new ErrorT(
+            `Incompatibilidade de tipos: ${left.inspect()} ${operator} ${right.inspect()}`
+        );
+    }
+
+    evalIntegerInfixOperator(operator: string, left: IntegerT, right: IntegerT): IntegerT | BoolT | ErrorT {
+        switch (operator) {
+            case "+":
+                return new IntegerT(left.value + right.value);
+            case "-":
+                return new IntegerT(left.value - right.value);
+            case "*":
+                return new IntegerT(left.value * right.value);
+            case "/":
+                if (right.value === 0) {
+                    // Runtime error
+                    throw new Error("Divisão por zero não permitida");
+                }
+                return new IntegerT(Math.floor(left.value / right.value));
+            case "<":
+                return this.toBoolT(left.value < right.value);
+            case ">":
+                return this.toBoolT(left.value > right.value);
+            case "==":
+                return this.toBoolT(left.value == right.value);
+            case "<>":
+                return this.toBoolT(left.value != right.value);
+        }
+    }
+
+    evalBooleanInfixOperator(operator: string, left: BoolT, right: BoolT): BoolT | ErrorT {
+        switch (operator) {
+            case "==":
+                return this.toBoolT(left === right);
+            case "!=":
+                return this.toBoolT(left !== right);
+        }
+        return new ErrorT(
+            `Operador não definido: ${left.inspect()} ${operator} ${right.inspect()}`
+        );
+    }
+
     evalPrefixExpr(operator: string, right: BaseType): BaseType {
         if (operator == "!") {
             return this.evalBangOperatorExpr(right);
-        }else if (operator == "-") {
+        } else if (operator == "-") {
             return this.evalMinusPrefixOperatorExpr(right);
-        }else {
+        } else {
             return new ErrorT(`Operador não definido: ${operator}${right.inspect()}`);
         }
     }
@@ -60,6 +118,15 @@ export class Interpreter {
         } else {
             return H_TYPES.FALSE;
         }
+    }
+
+    errorType(node) {
+        return node instanceof ErrorT;
+    }
+
+    toBoolT(expr) {
+        if (expr != H_TYPES.TRUE) return H_TYPES.TRUE;
+        if (expr != H_TYPES.FALSE) return H_TYPES.FALSE;
     }
 }
 
