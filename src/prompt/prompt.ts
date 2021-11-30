@@ -46,10 +46,10 @@ async function run() {
         }else {
             console.dir(ast, {depth: null});
         }
-        const interpreter = new Interpreter();
         const symbolTable = new SymbolTable();
-        const result = interpreter.eval(ast, symbolTable);
-        console.log(result.inspect());
+        const interpreter = new Interpreter(symbolTable);
+        const result = interpreter.evalAst(ast);
+        console.log(result);
     }
 }
 

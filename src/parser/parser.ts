@@ -1,4 +1,4 @@
-import { ASTKind, Expression, ExprStatement, Integer, PrefixExpression, Program } from '../ast/ast';
+import { ASTKind, Program } from '../ast/ast';
 import Lexer from "../lexer/lexer";
 import { Token, TokenType } from "../lexer/tokens";
 
@@ -96,6 +96,7 @@ export default class Parser {
     }
 
     parseExpression(precedence) {
+        console.log('type' + this.currentToken.type);
         const prefix = this.prefixFn[this.currentToken.type];
         if (!prefix) {
             this.errors.push(`Linha ${this.currentToken.line}, Expressão inválida ${this.currentToken.type}`);

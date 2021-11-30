@@ -30,7 +30,8 @@ export type Expression =
     | Integer
     | PrefixExpression
     | InfixExpression
-    | String;
+    | String
+    | Float;
 
 export type Statement =
     | BlockStatement
@@ -62,7 +63,7 @@ export type ValStatement = {
 
 export type ReturnStatment = {
     kind: ASTKind.Return;
-    returnValue: Expression;
+    value: Expression;
 };
 
 export type Bool = {
@@ -108,6 +109,11 @@ export type InfixExpression = {
 
 export type Integer = {
     kind: ASTKind.Integer;
+    value: number;
+};
+
+export type Float = {
+    kind: ASTKind.Float;
     value: number;
 };
 
