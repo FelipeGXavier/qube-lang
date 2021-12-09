@@ -16,7 +16,10 @@ export enum ASTKind {
     PrefixExpression = "PREFIX_EXPRESSION",
     Program = "PROGRAM",
     Return = "RETURN",
-    String = "STRING"
+    String = "STRING",
+    WhileExpression = "WHILE_EXPRESSION",
+    ReassignStatement = "REASSIGN_STATEMENT",
+    Assign = "="
 }
 
 export type Node = Program | Statement | Expression;
@@ -31,13 +34,16 @@ export type Expression =
     | PrefixExpression
     | InfixExpression
     | String
-    | Float;
+    | Float
+    | WhileExpression;
 
 export type Statement =
     | BlockStatement
     | ExprStatement
     | ValStatement
+    | ReassignStatement
     | ReturnStatment;
+    
 
 export type Program = {
     kind: ASTKind.Program;
@@ -53,6 +59,12 @@ export type BlockStatement = {
 export type ExprStatement = {
     kind: ASTKind.ExprStatement;
     expression: Expression;
+};
+
+export type ReassignStatement = {
+    kind: ASTKind.ReassignStatement;
+    name: Id;
+    value: Expression;
 };
 
 export type ValStatement = {
@@ -98,6 +110,12 @@ export type IfExpression = {
     condition: Expression;
     consequence: BlockStatement;
     alternative?: BlockStatement;
+};
+
+export type WhileExpression = {
+    kind: ASTKind.WhileExpression;
+    condition: Expression;
+    consequence: BlockStatement;
 };
 
 export type InfixExpression = {

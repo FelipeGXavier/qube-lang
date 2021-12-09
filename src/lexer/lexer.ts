@@ -37,9 +37,14 @@ export default class Lexer {
             this.next();
         }
 
-        if (this.currentChar == "=" && this.peek() == "=") {
-            this.next();
-            token = new Token(TokenType.EQ, "==").setLine(this.line);
+        if (this.currentChar == "=") {
+            if (this.peek() == "=") {
+                this.next();
+                token = new Token(TokenType.EQ, "==").setLine(this.line);
+            }else {
+                token = new Token(TokenType.Assign, this.currentChar).setLine(this.line);
+            }
+            
         } else if (this.currentChar == "'") {
             token = new Token(TokenType.String, this.string()).setLine(this.line);
         } else if (this.currentChar == TokenType.Assign) {
@@ -85,7 +90,6 @@ export default class Lexer {
             } else if (this.isNumeric(this.currentChar)) {
                 return this.numeric();
             } else {
-                console.log(this.currentChar);
                 return new Token(TokenType.Illegal, this.currentChar).setLine(this.line);
             }
         }

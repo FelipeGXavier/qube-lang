@@ -1,4 +1,4 @@
-import { ASTKind, IfExpression, Node, Statement, ReturnStatment, Id, CallExpression, Expression } from '../ast/ast';
+import { ASTKind, IfExpression, Node, Statement, ReturnStatment, Id, CallExpression, Expression, WhileExpression, ExprStatement, ReassignStatement } from '../ast/ast';
 import { SymbolTable } from '../env/symbol.table';
 import { IntegerT } from '../env/integer';
 import { BaseType } from '../env/btype';
@@ -11,6 +11,7 @@ import { FloaT } from '../env/float';
 import { StringT } from '../env/string';
 import { builtins } from '../env/api';
 import { BuiltinT } from '../env/builtin';
+import { NullT } from '../env/null';
 
 export class Interpreter {
 
@@ -47,6 +48,8 @@ export class Interpreter {
                 return this.evalStatements(node.statements, symbolTable);
             case ASTKind.IfExpression:
                 return this.evalIfExpr(node, symbolTable);
+            case ASTKind.WhileExpression:
+                return this.evalWhileExpr(node, symbolTable);
             case ASTKind.Return:
                 const returns = this.eval(node.value, symbolTable);
                 if (this.errorType(returns)) return returns;
@@ -67,6 +70,15 @@ export class Interpreter {
                     return fnArgs[0];
                 }
                 return this.executeFn(fn, fnArgs);
+            case ASTKind.ReassignStatement:
+                const exp = node.value;
+                const id = this.eval(node.name, symbolTable);
+                if (id instanceof ErrorT) {
+                    return id;
+                }
+                const value = this.eval(exp, symbolTable);
+                if(this.errorType(value) || value == null) return value;
+                return this.evalReassignId(node, value, symbolTable);
             case ASTKind.Val:
                 const val = this.eval(node.value, symbolTable);
                 if (this.errorType(val)) return val;
@@ -77,6 +89,26 @@ export class Interpreter {
             case ASTKind.String:
                 return new StringT(node.value);
            
+                
+
+
+        }
+    }
+
+    private evalWhileExpr(node: WhileExpression, symbolTable: SymbolTable) {
+        while (true) {
+            const condition = this.eval(node.condition, symbolTable);
+            if (this.errorType(condition) || condition == null) {
+                return condition;
+            }
+            if (condition != H_TYPES.FALSE && condition != H_TYPES.NIL) {
+                const consequence = this.eval(node.consequence, symbolTable);
+                if (this.errorType(consequence)) {
+                    return consequence;
+                }
+            }else {
+                break;
+            }
         }
     }
 
@@ -96,7 +128,7 @@ export class Interpreter {
             if (evaluated instanceof ReturnT) {
                 return evaluated.value;
             }
-        }else if (fn instanceof BuiltinT) {
+        } else if (fn instanceof BuiltinT) {
             return fn.func(...args);
         }
         return new ErrorT(`Elemento não é uma função válida: ${fn.inspect()}`);
@@ -130,7 +162,7 @@ export class Interpreter {
         for (const statement of statements) {
             result = this.eval(statement, symbolTable);
             if (result instanceof ErrorT) {
-                console.dir(result.error, {depth: null});
+                console.dir(result.error, { depth: null });
                 return result;
             }
             if (result instanceof ReturnT) {
@@ -176,6 +208,14 @@ export class Interpreter {
         return new ErrorT(
             `Incompatibilidade de tipos: ${left.inspect()} ${operator} ${right.inspect()}`
         );
+    }
+
+    private evalReassignId(node: ReassignStatement, value, symbolTable: SymbolTable) {
+        if (!symbolTable.get(node.name.value)) {
+            return new ErrorT(`Identificador não encontrado: ${node.value}`);
+        }
+        symbolTable.set(node.name.value, value);
+        return H_TYPES.NIL;
     }
 
     private evalIntegerInfixOperator(operator: string, left: IntegerT, right: IntegerT): IntegerT | BoolT | ErrorT {
@@ -259,4 +299,6 @@ export class Interpreter {
         return this.symbolTable;
     }
 }
+
+
 

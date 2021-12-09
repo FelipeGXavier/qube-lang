@@ -1,4 +1,4 @@
-import { ASTKind, Program } from '../ast/ast';
+import { ASTKind, Program, WhileExpression, Id } from '../ast/ast';
 import Lexer from "../lexer/lexer";
 import { Token, TokenType } from "../lexer/tokens";
 
@@ -51,11 +51,38 @@ export default class Parser {
             return this.parseDeclarationStatement();
         } else if (this.currentToken.type == TokenType.Return) {
             return this.parsetReturn();
+        } else if (this.currentToken.type == TokenType.Ident && this.peekTokenIs(TokenType.Assign)) {
+            return this.parseReassignStatement();
+        } else if (this.currentToken.type == TokenType.While) {
+            return this.parseWhileStatement();
         } else {
             return this.parseExprStatement();
         }
     }
 
+    parseReassignStatement() {
+        const identifier = {
+            kind: ASTKind.Id,
+            value: this.currentToken.value
+        };
+        if (!this.peekTokenIs(TokenType.Assign)) {
+            return null;
+        }else {
+            this.next();
+        }
+        this.next();
+        const val = this.parseExpr(ExpressionPrecedence.LOWEST);
+        if (val == null) return val;
+        if (this.peekTokenIs(TokenType.Semicolon)) {
+            this.next();
+        }
+        return {
+            kind: ASTKind.ReassignStatement,
+            value: val,
+            name: identifier,
+        }
+    }
+   
     // Erros sintáticos
     public getErrors() {
         return this.errors;
@@ -134,6 +161,28 @@ export default class Parser {
             const msg = `Linha ${this.currentToken.line}, Não foi possível converter o valor numérico ${this.currentToken.value}`;
             this.errors.push(msg);
             return null;
+        }
+    }
+
+    parseWhileStatement() {
+        if (!this.consume(TokenType.LParen)) {
+            return null;
+        }
+        this.next();
+        const condition = this.parseExpression(ExpressionPrecedence.LOWEST);
+        if (condition == null) {
+            return null;
+        }
+        if(!this.consume(TokenType.RParen)) {
+            return null;
+        }
+        if(!this.consume(TokenType.LBrace)) {
+            return null;
+        }
+        return {
+            condition,
+            kind: ASTKind.WhileExpression,
+            consequence: this.parseBlockStatement()
         }
     }
 

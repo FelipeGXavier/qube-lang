@@ -40,7 +40,8 @@ export enum TokenType {
     If = "IF",
     Else = "ELSE",
     Return = "RETURN",
-    Print = "PRINT"
+    Print = "PRINT",
+    While = "WHILE"
 }
 
 
@@ -70,7 +71,8 @@ export const keywords = {
     if: TokenType.If,
     else: TokenType.Else,
     return: TokenType.Return,
-    print: TokenType.Print
+    print: TokenType.Print,
+    while: TokenType.While
 };
 
 

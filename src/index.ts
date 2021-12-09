@@ -6,8 +6,14 @@ import { SymbolTable } from './env/symbol.table';
 
 const input = 
 `
-val add = def(x, y) { return x+y; }
-console('Resultado: ', add(1, 2), true, false);
+val x = 1;
+while(x < 10) {
+    x = x + 1;
+    if (x == 9) {
+        console('Aqui');
+    }
+}
+console('Resultado: ', x);
 `;
 
 const lexer = new Lexer(input);
@@ -21,6 +27,4 @@ if (errors.length > 0) {
 }else {
     const result = interpreter.evalAst(ast);
     const t = interpreter.dump();
-    console.log(t);
-    //console.log(t.get('y'));
 }
