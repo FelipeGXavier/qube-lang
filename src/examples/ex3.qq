@@ -1,0 +1,6 @@
+val x = 10/5+2;
+val y = 5;
+val sum = def(x,y) {
+    return x + y;
+}
+val result = sum(sum(1,2), sum(x,y));

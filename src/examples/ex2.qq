@@ -1,0 +1,17 @@
+val x = 10/5+2;
+val y = 5;
+val sum = def(x,y) {
+    return x + y;
+}
+val fn = def(x) {
+    if (x <> 0) {
+        return true;
+    }
+    if (x > 0) {
+        return false;
+    }else {
+        return true;
+    }
+}
+val result_sum = sum(sum(1,2), sum(x,y));
+val result_fn = fn(10);

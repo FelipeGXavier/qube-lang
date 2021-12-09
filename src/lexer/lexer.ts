@@ -85,6 +85,7 @@ export default class Lexer {
             } else if (this.isNumeric(this.currentChar)) {
                 return this.numeric();
             } else {
+                console.log(this.currentChar);
                 return new Token(TokenType.Illegal, this.currentChar).setLine(this.line);
             }
         }

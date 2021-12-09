@@ -96,7 +96,6 @@ export default class Parser {
     }
 
     parseExpression(precedence) {
-        console.log('type' + this.currentToken.type);
         const prefix = this.prefixFn[this.currentToken.type];
         if (!prefix) {
             this.errors.push(`Linha ${this.currentToken.line}, Expressão inválida ${this.currentToken.type}`);

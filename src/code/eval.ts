@@ -9,6 +9,8 @@ import { ReturnT } from '../env/return';
 import { FunctionT } from '../env/function';
 import { FloaT } from '../env/float';
 import { StringT } from '../env/string';
+import { builtins } from '../env/api';
+import { BuiltinT } from '../env/builtin';
 
 export class Interpreter {
 
@@ -94,6 +96,8 @@ export class Interpreter {
             if (evaluated instanceof ReturnT) {
                 return evaluated.value;
             }
+        }else if (fn instanceof BuiltinT) {
+            return fn.func(...args);
         }
         return new ErrorT(`Elemento não é uma função válida: ${fn.inspect()}`);
     }
@@ -116,6 +120,8 @@ export class Interpreter {
         if (value) {
             return value;
         }
+        const builtin = builtins[node.value];
+        if (builtin) return builtin;
         return new ErrorT(`Identificador não encontrado: ${node.value}`);
     }
 

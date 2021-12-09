@@ -1,0 +1,6 @@
+val t = 'teste';
+val y = 10.5;
+val z = 10*2*3+10-2;
+val p = !true;
+val u = !!false;
+val r = -10;
